@@ -12,3 +12,4 @@ python-docx
 PyPDF2
 reportlab
 openpyxl
+psycopg2-binary
