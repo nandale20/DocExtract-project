@@ -329,6 +329,32 @@ async function extractFromPdf(file) {
   return fullText;
 }
 
+async function loadHistory() {
+  try {
+    const res = await fetch('/list_extractions');
+    const data = await res.json();
+
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <strong>${item.file_name}</strong> 
+        (${item.file_type}) - 
+        ${item.char_count} chars
+      `;
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.log('History error:', err);
+  }
+}
+window.onload = () => {
+  loadHistory();
+};
+
 // ======================================================
 // IMAGE OCR
 // ======================================================
