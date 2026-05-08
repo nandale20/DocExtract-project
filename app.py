@@ -14,6 +14,7 @@ import re
 import mysql.connector
 import logging
 import io
+import psycopg2
 
 from reportlab.pdfgen import canvas
 
@@ -37,13 +38,15 @@ logging.basicConfig(level=logging.INFO)
 # DATABASE CONFIG
 # =========================================================
 
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'data_tool'
-}
+conn = psycopg2.connect(
+    host="YOUR_HOST",
+    database="YOUR_DATABASE",
+    user="YOUR_USER",
+    password="YOUR_PASSWORD",
+    port=5432
+)
 
+cursor = conn.cursor()
 
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
