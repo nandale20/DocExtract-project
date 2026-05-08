@@ -38,18 +38,17 @@ logging.basicConfig(level=logging.INFO)
 # DATABASE CONFIG
 # =========================================================
 
+import psycopg2
+
 conn = psycopg2.connect(
-    host="YOUR_HOST",
-    database="YOUR_DATABASE",
+    host="YOUR_RENDER_HOST",
+    database="YOUR_DB",
     user="YOUR_USER",
     password="YOUR_PASSWORD",
     port=5432
 )
 
 cursor = conn.cursor()
-
-def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
 
 
 # =========================================================
