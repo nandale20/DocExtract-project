@@ -41,10 +41,10 @@ logging.basicConfig(level=logging.INFO)
 
 
 conn = psycopg2.connect(
-    host="YOUR_RENDER_HOST",
-    database="YOUR_DB",
-    user="YOUR_USER",
-    password="YOUR_PASSWORD",
+    host="dpg-d7uqpt3eo5us73da3bcg-a",
+    database="data_tool_db_7jog_user",
+    user="data_tool_db_7jog_user",
+    password="lGO3TXz8LyMVAKzpEEjLSQAQnq8FAGwt",
     port=5432
 )
 
