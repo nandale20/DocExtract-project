@@ -73,7 +73,62 @@ def extract_structured_data(text):
         "dates": dates or ["Not found"],
         "money": money or ["Not found"]
     }
+#download
+@app.route('/download', methods=['POST'])
+def download():
 
+    data = request.json
+
+    text = data.get('text', '')
+    analysis = data.get('analysis', {})
+
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer)
+
+    y = 800
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawString(40, y, "DocExtract AI Report")
+
+    y -= 40
+    pdf.setFont("Helvetica", 12)
+
+    sections = [
+        ("Names", analysis.get('names', [])),
+        ("Emails", analysis.get('emails', [])),
+        ("Phones", analysis.get('phones', [])),
+        ("Money", analysis.get('money', [])),
+        ("Dates", analysis.get('dates', []))
+    ]
+
+    for title, items in sections:
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(40, y, f"{title} ({len(items)})")
+        y -= 20
+
+        pdf.setFont("Helvetica", 11)
+
+        if not items:
+            pdf.drawString(60, y, "No data found")
+            y -= 20
+        else:
+            for item in items:
+                pdf.drawString(60, y, str(item)[:100])
+                y -= 18
+                if y < 60:
+                    pdf.showPage()
+                    y = 800
+
+        y -= 10
+
+    pdf.save()
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name="report.pdf",
+        mimetype="application/pdf"
+    )
 # =========================================================
 # FILE PROCESSORS
 # =========================================================
