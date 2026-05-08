@@ -1,0 +1,11 @@
+flask
+flask-talisman
+flask-cors
+mysql-connector-python
+pandas
+pytesseract
+pillow
+python-docx
+PyPDF2
+reportlab
+openpyxl

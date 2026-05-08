@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>DocExtract AI — Extract text & charts from documents</title>
+
+  <meta name="description"
+    content="Drag and drop PDFs or images. Extract text, detect numbers, and generate charts instantly." />
+
+  <link rel="stylesheet"
+    href="{{ url_for('static', filename='styles.css') }}" />
+
+  <!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+</script>
+
+<!-- Tesseract -->
+<script src="https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <div class="brand">
+      <div class="brand-mark">D</div>
+      <span>DocExtract AI</span>
+    </div>
+
+    <nav class="nav">
+      <button id="themeBtn"
+        class="btn btn-ghost"
+        title="Toggle theme">
+        🌙
+      </button>
+    </nav>
+
+  </header>
+
+  <!-- MAIN -->
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <span class="eyebrow">
+        PDF • PNG • JPG • OCR
+      </span>
+
+      <h1>
+        Extract text and visualize data, instantly
+      </h1>
+
+      <p>
+        Drop a document and DocExtract AI will pull the text,
+        detect numbers, and chart what matters —
+        all running in your browser.
+      </p>
+
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="upload">
+
+      <div id="dropzone" class="dropzone">
+
+        <div class="dropzone-icon">⤴</div>
+
+        <h3>Drag & drop your file here</h3>
+
+        <div class="hint">
+          PDF, PNG, JPG, JPEG supported (max ~20 MB)
+        </div>
+
+        <input id="fileInput"
+          type="file"
+          accept=".pdf,.png,.jpg,.jpeg"
+          hidden />
+
+        <div class="row">
+
+          <button id="chooseFileBtn"
+            class="btn btn-primary"
+            type="button">
+            Choose File
+          </button>
+
+          <button id="sampleBtn"
+            class="btn"
+            type="button">
+            Try Sample Invoice
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="progressCard"
+      class="progress-card hidden">
+
+      <div class="spinner"></div>
+
+      <h3>Processing document...</h3>
+
+      <p id="progressLabel">
+        Initializing...
+      </p>
+
+      <div class="bar">
+        <span id="progressBar"></span>
+      </div>
+
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results" class="hidden">
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:16px;
+      ">
+
+        <h2>Extraction Results</h2>
+
+        <span id="successPop"
+          class="success-pop hidden">
+          ✓ Extraction Complete
+        </span>
+
+      </div>
+
+      <div class="results-grid">
+
+        <!-- TEXT -->
+        <div class="card">
+
+          <h2>📄 Extracted Text</h2>
+
+          <div id="metaBox" class="meta"></div>
+
+          <div id="textBox" class="text-box"></div>
+
+          <div class="toolbar">
+
+            <button id="reUploadBtn"
+              class="btn">
+              ↺ Upload New
+            </button>
+
+            <button id="toggleChartsBtn"
+              class="btn">
+              Hide Charts
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- CHARTS -->
+        <div class="card">
+
+          <h2>📊 Auto-Generated Charts</h2>
+
+          <div id="chartsStack"
+            class="charts-stack">
+          </div>
+
+          <div class="toolbar">
+
+            <button id="downloadBtn"
+              class="btn btn-primary">
+              ⬇ Download PDF Report
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- HISTORY -->
+<div class="card"
+  style="margin-top:28px;">
+
+  <h2>🗂 Extraction History</h2>
+
+  <ul id="historyList"
+    class="history-list">
+  </ul>
+
+</div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    DocExtract AI • Flask + Vanilla JS • Runs in your browser
+  </footer>
+
+  <!-- APP JS -->
+  <script defer
+    src="{{ url_for('static', filename='app.js') }}">
+  </script>
+
+</body>
+
+</html>
