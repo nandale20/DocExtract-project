@@ -39,7 +39,7 @@ def get_db_connection():
         host="dpg-d7uqpt3eo5us73da3bcg-a.ohio-postgres.render.com",
         database="data_tool_db_7jog",
         user="data_tool_db_7jog_user",
-        password="YOUR_RENDER_PASSWORD",  # replace this
+        password="lGO3TXz8LyMVAKzpEEjLSQAQnq8FAGwt",  # replace this
         port=5432
     )
 
