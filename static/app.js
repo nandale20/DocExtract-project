@@ -662,77 +662,33 @@ function analyzeText(text) {
 // DOWNLOAD PDF
 // ======================================================
 
-downloadBtn?.addEventListener('click', async () => {
+function downloadPDF(text, analysis) {
+  fetch("/download", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: text,
+      analysis: analysis
+    })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Download failed");
+    return res.blob();
+  })
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
 
-  try {
-
-    if (!currentResult) {
-
-      alert('No data available');
-
-      return;
-
-    }
-
-    // Analyze extracted text
-    const analyzed =
-      analyzeText(currentResult.extracted_text);
-
-    const response = await fetch('/download', {
-
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
-      body: JSON.stringify({
-
-        text: currentResult.extracted_text,
-
-        analysis: analyzed
-
-      })
-
-    });
-
-    if (!response.ok) {
-
-      throw new Error('Failed to generate PDF');
-
-    }
-
-    const blob = await response.blob();
-
-    const url =
-      window.URL.createObjectURL(blob);
-
-    const a =
-      document.createElement('a');
-
+    const a = document.createElement("a");
     a.href = url;
-
-    a.download = 'report.pdf';
-
+    a.download = "report.pdf";
     document.body.appendChild(a);
-
     a.click();
-
     a.remove();
-
-    window.URL.revokeObjectURL(url);
-
-  }
-
-  catch (err) {
-
-    console.error(err);
-
-    alert('PDF download failed');
-
-  }
-
-});
+  })
+  .catch(err => console.log(err));
+}
 // ======================================================
 // HISTORY
 // ======================================================
@@ -741,78 +697,39 @@ downloadBtn?.addEventListener('click', async () => {
 // LOAD HISTORY
 // ======================================================
 
-async function loadHistory() {
+function loadHistory() {
+  fetch("/list_extractions")
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("historyList");
 
-  try {
+      list.innerHTML = "";
 
-    const res =
-      await fetch('/list_extractions');
+      if (!data || data.length === 0) {
+        list.innerHTML = "<li>No history found</li>";
+        return;
+      }
 
-    if (!res.ok) {
+      data.forEach(row => {
+        const li = document.createElement("li");
 
-      throw new Error(
-        'History load failed'
-      );
+        li.innerHTML = `
+          <div style="padding:8px;border-bottom:1px solid #333">
+            <b>${row.file_name}</b><br>
+            Type: ${row.file_type} | Size: ${row.file_size} bytes<br>
+            Characters: ${row.char_count}<br>
+            <small>${row.created_at}</small>
+          </div>
+        `;
 
-    }
-
-    const rows = await res.json();
-
-    historyList.innerHTML = '';
-
-    if (!rows.length) {
-
-      historyList.innerHTML =
-        '<li class="empty">No history found</li>';
-
-      return;
-
-    }
-
-    rows.forEach(r => {
-
-      const li =
-        document.createElement('li');
-
-      li.className = 'history-item';
-
-      li.innerHTML = `
-
-        <div class="name">
-          ${escapeHtml(r.file_name)}
-        </div>
-
-        <div class="sub">
-
-          ${formatSize(r.file_size)}
-          •
-          ${new Date(
-            r.created_at
-          ).toLocaleString()}
-
-        </div>
-
-      `;
-
-      historyList.appendChild(li);
-
-    });
-
-  }
-
-  catch (err) {
-
-    console.error(err);
-
-    historyList.innerHTML = `
-      <li class="empty">
-        Failed to load history
-      </li>
-    `;
-
-  }
-
+        list.appendChild(li);
+      });
+    })
+    .catch(err => console.log("History error:", err));
 }
+window.onload = function () {
+  loadHistory();
+};
 //
 //
 // ======================================================
