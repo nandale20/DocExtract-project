@@ -38,7 +38,7 @@ logging.basicConfig(level=logging.INFO)
 # DATABASE CONFIG
 # =========================================================
 
-import psycopg2
+
 
 conn = psycopg2.connect(
     host="YOUR_RENDER_HOST",
@@ -189,9 +189,10 @@ def upload():
         return jsonify({"error": "Unsupported file type"}), 400
 
     filename = secure_filename(file.filename)
+    file_type = filename.split('.')[-1]
 
     try:
-
+        # Process file based on type
         if filename.endswith('.csv'):
             text = process_csv(file)
 
@@ -216,10 +217,30 @@ def upload():
         else:
             return jsonify({"error": "Unsupported file"}), 400
 
+        # Clean + extract
         text = clean_text(text)
-
         structured = extract_structured_data(text)
 
+        # File size (safe method)
+        file.seek(0, 2)  # move cursor to end
+        file_size = file.tell()
+        file.seek(0)
+
+        # 🔥 SAVE TO DATABASE
+        cursor.execute("""
+            INSERT INTO results (file_name, file_size, file_type, extracted_text, char_count)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (
+            filename,
+            file_size,
+            file_type,
+            text,
+            len(text)
+        ))
+
+        conn.commit()
+
+        # Return response
         return jsonify({
             "text": text,
             "characters": len(text),
@@ -230,9 +251,7 @@ def upload():
         })
 
     except Exception as e:
-        return jsonify({
-            "error": escape(str(e))
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # =========================================================
@@ -293,8 +312,7 @@ def list_extractions():
 
     try:
         conn = get_db_connection()
-
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
 
         cursor.execute("""
             SELECT
@@ -313,12 +331,22 @@ def list_extractions():
         cursor.close()
         conn.close()
 
-        return jsonify(rows)
+        # Convert tuples → JSON-friendly dict
+        result = []
+        for row in rows:
+            result.append({
+                "id": row[0],
+                "file_name": row[1],
+                "file_size": row[2],
+                "file_type": row[3],
+                "char_count": row[4],
+                "created_at": row[5].strftime("%Y-%m-%d %H:%M:%S") if row[5] else None
+            })
+
+        return jsonify(result)
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
 
 
 # =========================================================
